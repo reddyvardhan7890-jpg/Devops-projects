@@ -39,6 +39,6 @@
     - name: Delete EC2 instances
       amazon.aws.ec2_instance:
         state: absent
-        name: "{{ item }}-{{ env }}"
+        name: "{{ item }} - {{ env }}"
         wait: true
       loop: "{{ instances }}"
