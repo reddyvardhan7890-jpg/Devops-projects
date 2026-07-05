@@ -10,8 +10,8 @@
     env: QA
 
     instances:
-      - mongodb
-      - catalogue
+      - mongodb - QA
+      - catalogue - QA
 
   tasks:
 
