@@ -1,6 +1,8 @@
+---
 - name: Destroy Roboshop infrastructure
   hosts: localhost
   connection: local
+  gather_facts: false
 
   collections:
     - amazon.aws
@@ -8,25 +10,24 @@
   vars:
     domain_name: daws88sonline.online
     env: QA
-    action: destroy
 
     instances:
-      - mongodb - QA
-      - catalogue - QA
+      - mongodb
+      - catalogue
+      # - frontend   # Uncomment if frontend exists
 
   tasks:
 
-    ### Delete frontend DNS record (public IP)
+    # Delete frontend DNS record (public IP)
     - name: Delete Route53 record for frontend
       amazon.aws.route53:
         state: absent
         zone: "{{ domain_name }}"
         record: "roboshop-{{ env | lower }}.{{ domain_name }}"
         type: A
-      loop: "{{ instances }}"
-      when: item == "frontend"
+      when: "'frontend' in instances"
 
-    ### Delete backend DNS records (private IP)
+    # Delete backend DNS records (private IP)
     - name: Delete Route53 records for backend services
       amazon.aws.route53:
         state: absent
@@ -36,11 +37,16 @@
       loop: "{{ instances }}"
       when: item != "frontend"
 
-    ### Delete EC2 instances
-    - name: delete ec2 instance
+    # Show what is being deleted
+    - name: Debug instance names
+      ansible.builtin.debug:
+        msg: "Deleting instance: {{ item }} - {{ env }}"
+      loop: "{{ instances }}"
+
+    # Delete EC2 instances
+    - name: Delete EC2 instances
       amazon.aws.ec2_instance:
         state: absent
         name: "{{ item }} - {{ env }}"
         wait: true
       loop: "{{ instances }}"
-      when: action == "destroy"
