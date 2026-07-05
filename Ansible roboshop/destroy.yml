@@ -1,0 +1,44 @@
+- name: Destroy Roboshop infrastructure
+  hosts: localhost
+  connection: local
+
+  collections:
+    - amazon.aws
+
+  vars:
+    domain_name: daws88sonline.online
+    env: QA
+
+    instances:
+      - mongodb
+      - catalogue
+
+  tasks:
+
+    ### Delete frontend DNS record (public IP)
+    - name: Delete Route53 record for frontend
+      amazon.aws.route53:
+        state: absent
+        zone: "{{ domain_name }}"
+        record: "roboshop-{{ env | lower }}.{{ domain_name }}"
+        type: A
+      loop: "{{ instances }}"
+      when: item == "frontend"
+
+    ### Delete backend DNS records (private IP)
+    - name: Delete Route53 records for backend services
+      amazon.aws.route53:
+        state: absent
+        zone: "{{ domain_name }}"
+        record: "{{ item }}-{{ env | lower }}.{{ domain_name }}"
+        type: A
+      loop: "{{ instances }}"
+      when: item != "frontend"
+
+    ### Delete EC2 instances
+    - name: Delete EC2 instances
+      amazon.aws.ec2_instance:
+        state: absent
+        name: "{{ item }}-{{ env }}"
+        wait: true
+      loop: "{{ instances }}"
