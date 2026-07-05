@@ -11,8 +11,8 @@
     - mongodb
     - catalogue
   tasks:
-  - name: create a ec2 instance
-    amazon.aws.ec2.instance:
+   - name: create a ec2 instance
+     amazon.aws.ec2.instance:
          instance_type: "t3.micro"
          security_group: "{{ sg_id }}"
          image_id: "{{ ami_id }}"
@@ -20,15 +20,15 @@
          tags:
            project: roboshop
            component: "{{ item }}"
-           Enviroment: "{{ env }}"
+           Environment: "{{ env }}"
            Name: "{{ item }} - {{ env }}"
-    loop: "{{ instances }}"
-    register: ec2_output
-    when: action == "create"
+     loop: "{{ instances }}"
+     register: ec2_output
+     when: action == "create"
     
-  - name: print the ec2_output
-    ansible.builtin.debug:
+   - name: print the ec2_output
+     ansible.builtin.debug:
         msg: "{{ ec2_output }}"
-    when: action == "create"
+     when: action == "create"
     
     
