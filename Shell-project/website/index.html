@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PizzaHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <header>
+
+        <div class="logo">
+
+            🍕 PizzaHub
+
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="#home">Home</a></li>
+
+                <li><a href="#menu">Menu</a></li>
+
+                <li><a href="#order">Orders</a></li>
+
+                <li><a href="#contact">Contact</a></li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <section class="hero" id="home">
+
+        <h1>Fresh & Hot Pizza Delivered</h1>
+
+        <p>Order your favorite pizza in seconds.</p>
+
+        <a href="#order" class="btn">Order Now</a>
+
+    </section>
+
+
+    <section id="menu">
+
+        <h2>Our Menu</h2>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <img src="Images/margherita.png">
+
+                <h3>Margherita</h3>
+
+                <p>$10</p>
+
+            </div>
+
+            <div class="card">
+
+                <img src="Images/pepperoni.png">
+
+                <h3>Pepperoni</h3>
+
+                <p>$12</p>
+
+            </div>
+
+            <div class="card">
+
+                <img src="Images/veg.png">
+
+                <h3>Veg Supreme</h3>
+
+                <p>$11</p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section id="order">
+
+        <h2>Place Your Order</h2>
+
+        <form action="/cgi-bin/order.sh" method="POST">
+
+            <input
+
+                type="email"
+
+                name="email"
+
+                placeholder="Enter your email"
+
+                required>
+
+            <button type="submit">
+
+                Place Order
+
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <section id="contact">
+
+        <h2>Contact</h2>
+
+        <p>Email : support@pizzahub.com</p>
+
+    </section>
+
+
+    <footer>
+
+        © 2026 PizzaHub
+
+    </footer>
+
+</body>
+
+</html>

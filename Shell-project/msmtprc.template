@@ -1,0 +1,13 @@
+defaults
+auth on
+tls on
+tls_trust_file /etc/ssl/certs/ca-bundle.crt
+
+account gmail
+host smtp.gmail.com
+port 587
+from YOUR_EMAIL
+user YOUR_EMAIL
+password YOUR_16_CHARACTER_APP_PASSWORD
+
+account default : gmail

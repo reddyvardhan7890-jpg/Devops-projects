@@ -1,0 +1,29 @@
+- name: create ec2 instance and r53 record
+  hosts:  all
+  connection: all
+  vars:
+    sg_id: sg-057bbd40346b0a45f
+    ami_id: ami-0220d79f3f480ecf5
+    domain_name: daws88sonline.online
+    env: QA
+    action: create
+    instances:
+    - mongodb
+    - catalogue
+    tasks:
+    - name: create a ec2 instance
+      amazon.aws.ec2.instance:
+         instance_type: "t3.micro"
+         security_group: "{{ sg_id }}"
+         image_id: "{{ ami_id }}"
+         name: "{{ item }} - {{ env }}"
+      loop: "{{ instances }}"
+      register: ec2_output
+      when: action == "create"
+    
+    - name: print the ec2_output
+      ansible.builtin.debug:
+         msg: "{{ ec2_output }}"
+      when: action == "create"
+    
+    
