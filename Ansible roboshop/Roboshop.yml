@@ -1,5 +1,5 @@
 - name: create ec2 instance and r53 record
-  hosts:  all
+  hosts:  localhost
   connection: local
   vars:
     sg_id: sg-057bbd40346b0a45f
@@ -11,8 +11,8 @@
     - mongodb
     - catalogue
   tasks:
-  - name: create a ec2 instance
-    amazon.aws.ec2_instance:
+    - name: create a ec2 instance
+      amazon.aws.ec2_instance:
         instance_type: "t3.micro"
         security_group: "{{ sg_id }}"
         image_id: "{{ ami_id }}"
@@ -22,13 +22,13 @@
           component: "{{ item }}"
           Environment: "{{ env }}"
           Name: "{{ item }} - {{ env }}"
-    loop: "{{ instances }}"
-    register: ec2_output
-    when: action == "create"
+      loop: "{{ instances }}"
+      register: ec2_output
+      when: action == "create"
     
-  - name: print the ec2_output
-    ansible.builtin.debug:
+    - name: print the ec2_output
+      ansible.builtin.debug:
       msg: "{{ ec2_output }}"
-    when: action == "create"
+      when: action == "create"
     
     
