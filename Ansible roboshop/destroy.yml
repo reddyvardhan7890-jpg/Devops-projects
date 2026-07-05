@@ -8,6 +8,7 @@
   vars:
     domain_name: daws88sonline.online
     env: QA
+    action: destroy
 
     instances:
       - mongodb - QA
