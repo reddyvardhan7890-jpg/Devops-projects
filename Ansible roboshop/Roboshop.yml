@@ -28,7 +28,7 @@
     
     - name: print the ec2_output
       ansible.builtin.debug:
-      msg: "{{ ec2_output }}"
+        msg: "{{ ec2_output }}"
       when: action == "create"
     
     - name: create r53 record for frontend
