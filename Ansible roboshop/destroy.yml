@@ -35,7 +35,7 @@
         record: "{{ item }}-{{ env | lower }}.{{ domain_name }}"
         type: A
       loop: "{{ instances }}"
-      when: item != "frontend"
+      #when: item != "frontend"
 
     # Show what is being deleted
     - name: Debug instance names
