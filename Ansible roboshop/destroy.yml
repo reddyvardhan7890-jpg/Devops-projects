@@ -40,7 +40,7 @@
     # Show what is being deleted
     - name: Debug instance names
       ansible.builtin.debug:
-        msg: "Deleting instance: {{ item }} - {{ env }}"
+        msg: "Deleting instance: {{ item }}-{{ env }}"
       loop: "{{ instances }}"
 
     # Delete EC2 instances
