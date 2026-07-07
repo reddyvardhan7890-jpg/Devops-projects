@@ -9,7 +9,7 @@
 
   vars:
     domain_name: daws88sonline.online
-    env: QA
+    env: qa
 
     instances:
       - mongodb
