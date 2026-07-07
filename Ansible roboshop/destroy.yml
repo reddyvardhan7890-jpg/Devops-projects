@@ -14,7 +14,7 @@
     instances:
       - mongodb
       - catalogue
-      # - frontend   # Uncomment if frontend exists
+      - frontend   # Uncomment if frontend exists
 
   tasks:
 
