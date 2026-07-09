@@ -2,7 +2,7 @@
   hosts:  localhost
   connection: local
   vars:
-    security_group: sg-057bbd40346b0a45f
+    security_group: sg-01f4954ece3c18d0b
     ami_id: ami-0220d79f3f480ecf5
     domain_name: daws88sonline.online
     env: qa
