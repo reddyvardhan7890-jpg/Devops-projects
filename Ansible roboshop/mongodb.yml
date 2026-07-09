@@ -13,7 +13,7 @@
 
   - name: allow remote connection
     ansible.builtin.replace:
-       path: /ect/mangod.conf
+       path: /etc/mangod.conf
        regexp: '127.0.0.1'
        replace: '0.0.0.0'
   
