@@ -14,7 +14,10 @@
     instances:
       - mongodb
       - catalogue
-      - frontend   # Uncomment if frontend exists
+      - frontend
+      - redis
+      - user
+      - cart   # Uncomment if frontend exists
 
   tasks:
 

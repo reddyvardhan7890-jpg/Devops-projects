@@ -11,6 +11,9 @@
     - mongodb
     - catalogue
     - frontend
+    - redis
+    - user
+    - cart
   tasks:
     - name: create a ec2 instance
       amazon.aws.ec2_instance:
