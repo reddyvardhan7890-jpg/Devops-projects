@@ -12,13 +12,17 @@
     env: qa
 
     instances:
-      - mongodb
-      - catalogue
-      - frontend
-      - redis
-      - user
-      - cart   # Uncomment if frontend exists
-
+    - mongodb
+    - catalogue
+    - frontend
+    - redis
+    - user
+    - cart
+    - mysql
+    - shipping
+    - rabbitmq
+    - payment
+    
   tasks:
 
     # Delete frontend DNS record (public IP)
