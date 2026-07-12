@@ -41,7 +41,7 @@
   
   - name: unarchieve payment
     ansible.builtin.unarchive:
-       src: /tmp/shpping.zip
+       src: /tmp/payment.zip
        dest: /app
        remote_src: yes
   
