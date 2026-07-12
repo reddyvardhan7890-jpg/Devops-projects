@@ -40,7 +40,7 @@
   
   - name: unarchieve shipping
     ansible.builtin.unarchieve:
-       src: /tmp/shpping.zip
+       src: /tmp/shipping.zip
        dest: /app
        remote_src: yes
   
