@@ -12,7 +12,7 @@
     - python3-level
   
   - name: create system user roboshop
-    ansbile.builtin.user:
+    ansible.builtin.user:
       name: roboshop
       system: true
       home: /app
@@ -40,7 +40,7 @@
       dest: /tmp/payment.zip
   
   - name: unarchieve payment
-    ansible.builtin.unarchieve:
+    ansible.builtin.unarchive:
        src: /tmp/shpping.zip
        dest: /app
        remote_src: yes
