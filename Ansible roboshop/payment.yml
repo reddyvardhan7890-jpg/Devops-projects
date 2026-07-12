@@ -12,7 +12,7 @@
     - python3-level
   
   - name: create system user roboshop
-    ansbile.butilin.user:
+    ansbile.builtin.user:
       name: roboshop
       system: true
       home: /app
