@@ -1,0 +1,37 @@
+[
+  {
+    "title":"Interstellar",
+    "genre":"Sci-Fi",
+    "language":"English",
+    "duration":"2h 49m",
+    "price":250
+  },
+  {
+    "title":"Avatar",
+    "genre":"Action",
+    "language":"English",
+    "duration":"3h 12m",
+    "price":300
+  },
+  {
+    "title":"Mission Impossible",
+    "genre":"Action",
+    "language":"English",
+    "duration":"2h 45m",
+    "price":280
+  },
+  {
+    "title":"Superman",
+    "genre":"Action",
+    "language":"English",
+    "duration":"2h 15m",
+    "price":220
+  },
+  {
+    "title":"odessey",
+    "genre":"Action",
+    "language":"English",
+    "duration":"2h 15m",
+    "price":170
+  }
+]

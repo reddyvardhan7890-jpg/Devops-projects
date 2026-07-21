@@ -1,0 +1,75 @@
+- name: create ec2 instance and r53 record
+  hosts:  localhost
+  connection: local
+  vars:
+    security_group: sg-01f4954ece3c18d0b
+    ami_id: ami-0220d79f3f480ecf5
+    domain_name: moviesandseries.online
+    env: qa
+    action: create
+    instances:
+    - mongodb
+    - catalogue
+    - frontend
+    - redis
+    - user
+    - cart
+    - mysql
+    - shipping
+    - rabbitmq
+    - payment
+    - booking
+  tasks:
+    - name: create a ec2 instance
+      amazon.aws.ec2_instance:
+        instance_type: "t3.micro"
+        security_group: "{{ security_group }}"
+        image_id: "{{ ami_id }}"
+        region: us-east-1
+        wait: true
+        name: "{{ item }}-{{ env }}"
+        tags:
+          project: roboshop
+          component: "{{ item }}"
+          Environment: "{{ env }}"
+          Name: "{{ item }}-{{ env }}"
+      loop: "{{ instances }}"
+      register: ec2_output
+      when: action == "create"
+    
+    - name: print the ec2_output
+      ansible.builtin.debug:
+        msg: "{{ ec2_output }}"
+      when: action == "create"
+    
+    - name: create r53 record 
+      amazon.aws.route53:
+         state: present
+         zone: "{{ domain_name }}"
+         record: "{{ item.item }}-{{ env }}.{{ domain_name }}"
+         type: A 
+         ttl: 1
+         value: "{{ item.instances[0].private_ip_address }}"
+         wait: false
+         overwrite: true
+      loop: "{{ ec2_output.results }}"
+      when:
+        - action == "create"
+        - item.item != "frontend"
+      
+    - name: create r53 record for frontend
+      amazon.aws.route53:
+        state: present
+        zone: "{{ domain_name }}"
+        record: "frontend-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
+        type: A
+        ttl: 1
+        value: "{{ item.instances[0].public_ip_address }}"
+        wait: false
+        overwrite: true
+      loop: "{{ ec2_output.results }}"
+      when: 
+      - item.item == "frontend"
+      - action == "create"
+
+   

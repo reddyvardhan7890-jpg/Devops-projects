@@ -1,0 +1,60 @@
+
+- name: Destroy Roboshop infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - amazon.aws
+
+  vars:
+    domain_name: moviesandseries.online
+    env: qa
+
+    instances:
+    - mongodb
+    - catalogue
+    - frontend
+    - redis
+    - user
+    - cart
+    - mysql
+    - shipping
+    - rabbitmq
+    - payment
+    - booking
+    
+  tasks:
+
+    # Delete frontend DNS record (public IP)
+    - name: Delete Route53 record for frontend
+      amazon.aws.route53:
+        state: absent
+        zone: "{{ domain_name }}"
+        record: "roboshop-{{ env | lower }}.{{ domain_name }}"
+        type: A
+      when: "'frontend' in instances"
+
+    # Delete backend DNS records (private IP)
+    - name: Delete Route53 records for backend services
+      amazon.aws.route53:
+        state: absent
+        zone: "{{ domain_name }}"
+        record: "{{ item }}-{{ env | lower }}.{{ domain_name }}"
+        type: A
+      loop: "{{ instances }}"
+      #when: item != "frontend"
+
+    # Show what is being deleted
+    - name: Debug instance names
+      ansible.builtin.debug:
+        msg: "Deleting instance: {{ item }}-{{ env }}"
+      loop: "{{ instances }}"
+
+    # Delete EC2 instances
+    - name: Delete EC2 instances
+      amazon.aws.ec2_instance:
+        state: absent
+        name: "{{ item }}-{{ env }}"
+        wait: true
+      loop: "{{ instances }}"
