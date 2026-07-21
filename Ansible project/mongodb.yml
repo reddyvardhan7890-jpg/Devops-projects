@@ -10,7 +10,7 @@
   
   - name: install mongodb
     ansible.builtin.dnf:
-      name: mongodb-org
+      name: mongodb
       state: present
 
   - name: replace the configure IP
@@ -21,17 +21,24 @@
 
   - name: start and enable service
     ansible.builtin.service:
-      name: mongodb
+      name: mongod
       state: started
       enabled: yes
 
-  - name: copy the movie service
-    ansible.builtin.copy:
-      src: movies.json
-      dest: /tmp/movies.json
+  - name: Check if movie database exists
+    ansible.builtin.shell: |
+       mongosh --quiet --eval "db.getMongo().getDBNames().indexOf('moviehub')"
+    register: mongodb_check
+    changed_when: false
+    ignore_errors: yes
 
-  - name: import movies data into mongodb
-    ansible.builtin.command:
-      mongoimport --host localhost --port 27017
-      --db moviesdb --collection movies
-      --file /tmp/movies.json --jsonArray
+  - name: Copy movie data
+    ansible.builtin.copy:
+        src: movies.json
+        dest: /tmp/movies.json
+    when: mongodb_check.stdout == "-1"
+
+  - name: Import movie data
+    ansible.builtin.shell: |
+        mongoimport --db moviehub --collection movies --file /tmp/movies.json --jsonArray
+    when: mongodb_check.stdout == "-1"
