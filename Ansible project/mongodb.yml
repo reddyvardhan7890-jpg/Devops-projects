@@ -10,7 +10,7 @@
   
   - name: install mongodb
     ansible.builtin.dnf:
-      name: mongodb
+      name: mongodb-org
       state: present
 
   - name: replace the configure IP
@@ -27,7 +27,7 @@
 
   - name: Check if movie database exists
     ansible.builtin.shell: |
-       mongosh --quiet --eval "db.getMongo().getDBNames().indexOf('daws88sonline')"
+       mongosh --quiet --eval "db.getMongo().getDBNames().indexOf('moviehub')"
     register: mongodb_check
     changed_when: false
     ignore_errors: yes
