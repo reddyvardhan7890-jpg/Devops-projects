@@ -27,7 +27,7 @@
 
   - name: Check if movie database exists
     ansible.builtin.shell: |
-       mongosh --quiet --eval "db.getMongo().getDBNames().indexOf('moviehub')"
+       mongosh --quiet --eval "db.getMongo().getDBNames().indexOf('daws88sonline')"
     register: mongodb_check
     changed_when: false
     ignore_errors: yes
