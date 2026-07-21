@@ -29,3 +29,9 @@
     ansible.builtin.copy:
       src: movies.json
       dest: /tmp/movies.json
+
+  - name: import movies data into mongodb
+    ansible.builtin.command:
+      mongoimport --host localhost --port 27017
+      --db moviesdb --collection movies
+      --file /tmp/movies.json --jsonArray
