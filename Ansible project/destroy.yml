@@ -8,7 +8,7 @@
     - amazon.aws
 
   vars:
-    domain_name: moviesandseries.online
+    domain_name: daws88sonline.online
     env: qa
 
     instances:
