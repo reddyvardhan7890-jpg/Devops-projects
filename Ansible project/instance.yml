@@ -25,6 +25,7 @@
         instance_type: "t3.micro"
         security_group: "{{ security_group }}"
         image_id: "{{ ami_id }}"
+        key_name: your-keypair-name
         region: us-east-1
         wait: true
         name: "{{ item }}-{{ env }}"
