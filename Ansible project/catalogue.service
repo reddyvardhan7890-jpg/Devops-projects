@@ -1,0 +1,13 @@
+[Unit]
+Description=MovieHub Catalogue Service
+After=network.target
+
+[Service]
+User=movie
+WorkingDirectory=/app
+ExecStart=/usr/bin/node /app/server.js
+Restart=always
+Environment=MONGODB_HOST=mongodb-qa.daws88sonline.online
+
+[Install]
+WantedBy=multi-user.target
