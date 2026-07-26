@@ -1,0 +1,85 @@
+- name: configure user 
+  hosts: user
+  become: yes
+  tasks: 
+
+  - name: Disable NodeJS module
+    ansible.builtin.command: dnf module disable nodejs -y
+
+  - name: Enable NodeJS 20 module
+    ansible.builtin.command: dnf module enable nodejs:20 -y
+
+  - name: install nodejs  
+    ansible.builtin.dnf:
+      name: nodejs 
+      state: present
+
+  - name: create a user
+    ansible.builtin.user: 
+      name: movie
+      system: true
+      home: /app
+      shell: /sbin/nologin
+      comment: "Created a movie user"
+
+  - name: delete old directory
+    ansible.builtin.file:
+      path: /app
+      state: absent
+
+  - name: create a directory
+    ansible.builtin.file:
+      path: /app
+      state: directory
+
+  - name: delete user zip file
+    ansible.builtin.file:
+        path: /tmp/user.zip
+        state: absent
+
+  - name: Download zip file
+    ansible.builtin.get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip  
+      dest: /tmp/user.zip
+
+  - name: unarchive the zip
+    ansible.builtin.unarchive:
+      src: /tmp/user.zip
+      dest: /app
+      remote_src: yes
+
+  - name: install dependencies
+    community.general.npm:
+      path: /app
+
+  - name: Copy user service file
+    ansible.builtin.template:
+      src: user.service.j2
+      dest: /etc/systemd/system/user.service
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: daemon reload
+    ansible.builtin.systemd:
+      daemon_reload: yes
+  
+  - name: Enable and start user service
+    ansible.builtin.systemd:
+     name: user
+     state: restarted
+     enabled: yes
+
+  - name: Copy MongoDB repo
+  ansible.builtin.copy:
+    src: mongo.repo
+    dest: /etc/yum.repos.d/mongo.repo
+
+- name: Install MongoDB shell
+  ansible.builtin.dnf:
+    name: mongodb-mongosh
+    state: present
+
+- name: Load User schema
+  ansible.builtin.command: >
+    mongosh --host {{ MONGODB_HOST }} /app/db/master-data.js
