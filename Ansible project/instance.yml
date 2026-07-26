@@ -5,7 +5,7 @@
     security_group: sg-01f4954ece3c18d0b
     ami_id: ami-0220d79f3f480ecf5
     domain_name: daws88sonline.online
-    key_name: movie-hub
+    key_name: Ansible-project
     env: qa
     action: create
     instances:
