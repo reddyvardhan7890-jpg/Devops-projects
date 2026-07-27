@@ -64,7 +64,7 @@
 
   - name: Copy cart service file
     ansible.builtin.template:
-      src: cart.service.j2
+      src: cart.service 
       dest: /etc/systemd/system/cart.service
       owner: root
       group: root
