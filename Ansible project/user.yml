@@ -31,6 +31,9 @@
     ansible.builtin.file:
       path: /app
       state: directory
+      owner: movie
+      group: movie
+      mode: '0755'
 
   - name: delete user zip file
     ansible.builtin.file:
@@ -48,6 +51,13 @@
       dest: /app
       remote_src: yes
 
+  - name: Change ownership of app
+    ansible.builtin.file:
+      path: /app
+      owner: movie
+      group: movie
+      recurse: yes
+
   - name: install dependencies
     community.general.npm:
       path: /app
@@ -63,23 +73,23 @@
   - name: daemon reload
     ansible.builtin.systemd:
       daemon_reload: yes
-  
-  - name: Enable and start user service
-    ansible.builtin.systemd:
-     name: user
-     state: restarted
-     enabled: yes
 
   - name: Copy MongoDB repo
-  ansible.builtin.copy:
-    src: mongo.repo
-    dest: /etc/yum.repos.d/mongo.repo
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
 
-- name: Install MongoDB shell
-  ansible.builtin.dnf:
-    name: mongodb-mongosh
-    state: present
+  - name: Install MongoDB shell
+    ansible.builtin.dnf:
+      name: mongodb-mongosh
+      state: present
 
-- name: Load User schema
-  ansible.builtin.command: >
-    mongosh --host {{ MONGODB_HOST }} /app/db/master-data.js
+  - name: Load User schema
+    ansible.builtin.command: >
+     mongosh --host {{ MONGODB_HOST }} /app/db/master-data.js
+
+  - name: Enable and start user service
+    ansible.builtin.systemd:
+      name: user
+      state: restarted
+      enabled: yes
