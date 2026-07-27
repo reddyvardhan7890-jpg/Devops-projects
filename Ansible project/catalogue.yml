@@ -4,7 +4,7 @@
   tasks: 
   - name: install nodejs 20
     ansible.builtin.dnf:
-      name: nodejs:20
+      name: nodejs
       state: present
 
   - name: create a user

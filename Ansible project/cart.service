@@ -1,0 +1,12 @@
+[Unit]
+Description=Cart Service
+
+[Service]
+User=movie
+Environment=REDIS_HOST={{ REDIS_HOST }}
+Environment=CATALOGUE_HOST={{ CATALOGUE_HOST }}
+ExecStart=/bin/node /app/server.js
+SyslogIdentifier=cart
+
+[Install]
+WantedBy=multi-user.target
