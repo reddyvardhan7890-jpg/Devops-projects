@@ -2,12 +2,16 @@
   hosts: user
   become: yes
   tasks: 
-
   - name: Disable NodeJS module
     ansible.builtin.command: dnf module disable nodejs -y
 
   - name: Enable NodeJS 20 module
     ansible.builtin.command: dnf module enable nodejs:20 -y
+
+  - name: Install NodeJS
+    ansible.builtin.dnf:
+      name: nodejs
+      state: present
 
   - name: install nodejs  
     ansible.builtin.dnf:
@@ -73,20 +77,6 @@
   - name: daemon reload
     ansible.builtin.systemd:
       daemon_reload: yes
-
-  - name: Copy MongoDB repo
-    ansible.builtin.copy:
-      src: mongo.repo
-      dest: /etc/yum.repos.d/mongo.repo
-
-  - name: Install MongoDB shell
-    ansible.builtin.dnf:
-      name: mongodb-mongosh
-      state: present
-
-  - name: Load User schema
-    ansible.builtin.command: >
-     mongosh --host {{ MONGODB_HOST }} /app/db/master-data.js
 
   - name: Enable and start user service
     ansible.builtin.systemd:
