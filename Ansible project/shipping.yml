@@ -89,29 +89,18 @@
         owner: root
         group: root
         mode: '0644'
-    - name: Install pip
-      ansible.builtin.dnf:
-        name: python3-pip
-        state: present
 
-    - name: Install Python MySQL libraries
-      ansible.builtin.pip:
-        name:
-          - PyMySQL
-          - cryptography
+    - name: Import Shipping schema
+      ansible.builtin.shell: 
+       cmd: mysql < /app/db/schema.sql
 
-    - name: Import Shipping database schema
-      community.mysql.mysql_db:
-        state: import
-        name: all
-        login_host: "{{ MYSQL_HOST }}"
-        login_user: root
-        login_password: Roboshop@1
-        target: "{{ item }}"
-      loop:
-        - /app/db/schema.sql
-        - /app/db/app-user.sql
-        - /app/db/master-data.sql
+    - name: Import App User schema
+      ansible.builtin.shell: 
+       cmd: mysql < /app/db/app-user.sql
+
+    - name: Import Master Data
+      ansible.builtin.shell: 
+       cmd: mysql < /app/db/master-data.sql
 
     - name: Reload systemd
       ansible.builtin.systemd:
