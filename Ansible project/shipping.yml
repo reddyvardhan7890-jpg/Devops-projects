@@ -89,7 +89,17 @@
         owner: root
         group: root
         mode: '0644'
+    - name: Install pip
+      ansible.builtin.dnf:
+        name: python3-pip
+        state: present
 
+    - name: Install Python MySQL libraries
+      ansible.builtin.pip:
+        name:
+          - PyMySQL
+          - cryptography
+          
     - name: Import Shipping database schema
       community.mysql.mysql_db:
         state: import
