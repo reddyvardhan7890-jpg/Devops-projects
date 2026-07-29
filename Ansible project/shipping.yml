@@ -99,14 +99,14 @@
         name:
           - PyMySQL
           - cryptography
-          
+
     - name: Import Shipping database schema
       community.mysql.mysql_db:
         state: import
         name: all
         login_host: "{{ MYSQL_HOST }}"
         login_user: root
-        login_password: movie@1
+        login_password: Roboshop@1
         target: "{{ item }}"
       loop:
         - /app/db/schema.sql

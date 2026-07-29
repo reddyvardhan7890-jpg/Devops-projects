@@ -15,7 +15,7 @@
 
   - name: Set MySQL root password
     ansible.builtin.command:
-      cmd: mysql_secure_installation --set-root-pass movie@1
+      cmd: mysql_secure_installation --set-root-pass RoboShop@1
     register: mysql_password
     failed_when: false
     changed_when: mysql_password.rc == 0
