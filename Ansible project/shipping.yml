@@ -1,15 +1,25 @@
+---
 - name: Configure Shipping
   hosts: shipping
   become: yes
 
   tasks:
 
-    - name: Install Maven and MySQL client
+    - name: Install Maven, MySQL client and pip
       ansible.builtin.dnf:
         name:
           - maven
           - mysql
+          - python3-pip
         state: present
+
+    - name: Install Python MySQL libraries
+      ansible.builtin.pip:
+        name: "{{ item }}"
+        executable: pip3.9
+      loop:
+        - cryptography
+        - PyMySQL
 
     - name: Create application user
       ansible.builtin.user:
@@ -48,7 +58,7 @@
         dest: /app
         remote_src: yes
 
-    - name: Change ownership
+    - name: Set ownership of application files
       ansible.builtin.file:
         path: /app
         owner: movie
@@ -65,7 +75,7 @@
         cmd: mv target/shipping-1.0.jar shipping.jar
         chdir: /app
 
-    - name: Copy Shipping service
+    - name: Copy Shipping service file
       ansible.builtin.template:
         src: shipping.service
         dest: /etc/systemd/system/shipping.service
@@ -73,33 +83,26 @@
         group: root
         mode: '0644'
 
-    - name: Copy MySQL repo
+    - name: Copy MySQL repository file
       ansible.builtin.copy:
-        src: mysql.repo
+        src: files/mysql.repo
         dest: /etc/yum.repos.d/mysql.repo
+        owner: root
+        group: root
+        mode: '0644'
 
-    - name: Install MySQL client
-      ansible.builtin.dnf:
-        name: mysql
-        state: present
-
-    - name: Load Shipping schema
-      ansible.builtin.command:
-        cmd: mysql -h {{ MYSQL_HOST }} -uroot -pmovie@1 < /app/db/schema.sql
-      args:
-        executable: /bin/bash
-
-    - name: Load App User schema
-      ansible.builtin.command:
-        cmd: mysql -h {{ MYSQL_HOST }} -uroot -pmovie@1 < /app/db/app-user.sql
-      args:
-        executable: /bin/bash
-
-    - name: Load Master Data
-      ansible.builtin.command:
-        cmd: mysql -h {{ MYSQL_HOST }} -uroot -pmovie@1 < /app/db/master-data.sql
-      args:
-        executable: /bin/bash
+    - name: Import Shipping database schema
+      community.mysql.mysql_db:
+        state: import
+        name: all
+        login_host: "{{ MYSQL_HOST }}"
+        login_user: root
+        login_password: movie@1
+        target: "{{ item }}"
+      loop:
+        - /app/db/schema.sql
+        - /app/db/app-user.sql
+        - /app/db/master-data.sql
 
     - name: Reload systemd
       ansible.builtin.systemd:
@@ -108,5 +111,5 @@
     - name: Enable and start Shipping service
       ansible.builtin.systemd:
         name: shipping
-        state: started
+        state: restarted
         enabled: yes
