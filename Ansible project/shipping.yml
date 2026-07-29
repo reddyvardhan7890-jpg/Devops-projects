@@ -1,0 +1,112 @@
+- name: Configure Shipping
+  hosts: shipping
+  become: yes
+
+  tasks:
+
+    - name: Install Maven and MySQL client
+      ansible.builtin.dnf:
+        name:
+          - maven
+          - mysql
+        state: present
+
+    - name: Create application user
+      ansible.builtin.user:
+        name: movie
+        system: true
+        home: /app
+        shell: /sbin/nologin
+        comment: "Created movie user"
+
+    - name: Remove old app directory
+      ansible.builtin.file:
+        path: /app
+        state: absent
+
+    - name: Create app directory
+      ansible.builtin.file:
+        path: /app
+        state: directory
+        owner: movie
+        group: movie
+        mode: '0755'
+
+    - name: Remove old shipping zip
+      ansible.builtin.file:
+        path: /tmp/shipping.zip
+        state: absent
+
+    - name: Download shipping application
+      ansible.builtin.get_url:
+        url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
+        dest: /tmp/shipping.zip
+
+    - name: Extract shipping application
+      ansible.builtin.unarchive:
+        src: /tmp/shipping.zip
+        dest: /app
+        remote_src: yes
+
+    - name: Change ownership
+      ansible.builtin.file:
+        path: /app
+        owner: movie
+        group: movie
+        recurse: yes
+
+    - name: Build shipping application
+      ansible.builtin.command:
+        cmd: mvn clean package
+        chdir: /app
+
+    - name: Rename shipping jar
+      ansible.builtin.command:
+        cmd: mv target/shipping-1.0.jar shipping.jar
+        chdir: /app
+
+    - name: Copy Shipping service
+      ansible.builtin.template:
+        src: shipping.service
+        dest: /etc/systemd/system/shipping.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy MySQL repo
+      ansible.builtin.copy:
+        src: mysql.repo
+        dest: /etc/yum.repos.d/mysql.repo
+
+    - name: Install MySQL client
+      ansible.builtin.dnf:
+        name: mysql
+        state: present
+
+    - name: Load Shipping schema
+      ansible.builtin.command:
+        cmd: mysql -h {{ MYSQL_HOST }} -uroot -pmovie@1 < /app/db/schema.sql
+      args:
+        executable: /bin/bash
+
+    - name: Load App User schema
+      ansible.builtin.command:
+        cmd: mysql -h {{ MYSQL_HOST }} -uroot -pmovie@1 < /app/db/app-user.sql
+      args:
+        executable: /bin/bash
+
+    - name: Load Master Data
+      ansible.builtin.command:
+        cmd: mysql -h {{ MYSQL_HOST }} -uroot -pmovie@1 < /app/db/master-data.sql
+      args:
+        executable: /bin/bash
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Enable and start Shipping service
+      ansible.builtin.systemd:
+        name: shipping
+        state: started
+        enabled: yes
