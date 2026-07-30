@@ -13,11 +13,11 @@
   
   - name: create system user roboshop
     ansible.builtin.user:
-      name: roboshop
+      name: movie
       system: true
       home: /app
       shell: /sbin/nologin
-      comment: "Roboshop sytem user"
+      comment: "movie sytem user"
 
   - name: delete app directory
     ansible.builtin.file:
