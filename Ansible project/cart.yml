@@ -5,10 +5,12 @@
 
   - name: Disable NodeJS module
     ansible.builtin.command: dnf module disable nodejs -y
+    changed_when: false
 
   - name: Enable NodeJS 20 module
     ansible.builtin.command: dnf module enable nodejs:20 -y
-
+    changed_when: false
+    
   - name: install nodejs  
     ansible.builtin.dnf:
       name: nodejs 
