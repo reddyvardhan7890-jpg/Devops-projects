@@ -1,0 +1,14 @@
+[Unit]
+Description=Payment Service
+After=network.target
+
+[Service]
+User=movie
+Environment=CART_HOST={{ CART_HOST }}
+Environment=USER_HOST={{ USER_HOST }}
+Environment=AMQP_HOST={{ RABBITMQ_HOST }}
+ExecStart=/usr/bin/python3 /app/payment.py
+SyslogIdentifier=payment
+
+[Install]
+WantedBy=multi-user.target
