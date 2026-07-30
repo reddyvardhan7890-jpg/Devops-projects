@@ -1,11 +1,16 @@
 [Unit]
 Description=Cart Service
+After=network.target
 
 [Service]
 User=movie
+WorkingDirectory=/app
+
 Environment=REDIS_HOST={{ REDIS_HOST }}
 Environment=CATALOGUE_HOST={{ CATALOGUE_HOST }}
-ExecStart=/bin/node /app/server.js
+
+ExecStart=/usr/bin/node /app/server.js
+Restart=always
 SyslogIdentifier=cart
 
 [Install]
