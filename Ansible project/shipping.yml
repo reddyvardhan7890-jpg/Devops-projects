@@ -1,113 +1,92 @@
-- name: Configure Shipping
+- name: configure shipping server
   hosts: shipping
   become: yes
-
   tasks:
+  - name: install maven and mysql
+    ansible.builtin.dnf:
+      name: "{{ item }}"
+      state: present
+    loop: 
+    - maven
+    - mysql
 
-    - name: Install Maven, MySQL client and pip
-      ansible.builtin.dnf:
-        name:
-          - maven
-          - mysql
-          - python3-pip
-        state: present
+  - name: create system user roboshop
+    ansible.builtin.user:
+      name: movie
+      system: true
+      home: /app
+      shell: /sbin/nologin
+      comment: "movie system user"
+  
+  - name: delete app directory
+    ansible.builtin.file:
+       path: /app
+       state: absent 
+  
+  - name: create app directory
+    ansible.builtin.file:
+       path: /app
+       state: directory
+      
+  - name: delete shipping zip file
+    ansible.builtin.file:
+       path: /tmp/shipping.zip
+       state: absent 
 
-    - name: Install Python MySQL libraries
-      ansible.builtin.pip:
-        name: "{{ item }}"
-        executable: pip3.9
-      loop:
-        - cryptography
-        - PyMySQL
+  - name: download shipping 
+    ansible.builtin.get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip 
+      dest: /tmp/shipping.zip
+  
+  - name: unarchieve shipping
+    ansible.builtin.unarchive:
+       src: /tmp/shipping.zip
+       dest: /app
+       remote_src: yes
+  
+  - name: install dependencies
+    ansible.builtin.command: mvn clean package
+    args:
+      chdir: /app
 
-    - name: Create application user
-      ansible.builtin.user:
-        name: movie
-        system: true
-        home: /app
-        shell: /sbin/nologin
-        comment: "Created movie user"
+  - name: install dependencies
+    ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar 
+    args:
+      chdir: /app
 
-    - name: Remove old app directory
-      ansible.builtin.file:
-        path: /app
-        state: absent
+  - name: create systemctl service
+    ansible.builtin.template:
+      src: shipping.service
+      dest: /etc/systemd/system/shipping.service
 
-    - name: Create app directory
-      ansible.builtin.file:
-        path: /app
-        state: directory
-        owner: movie
-        group: movie
-        mode: '0755'
+  - name: daemon reload
+    ansible.builtin.systemd_service:
+      daemon_reload: true
 
-    - name: Remove old shipping zip
-      ansible.builtin.file:
-        path: /tmp/shipping.zip
-        state: absent
+  - name: install dependencie
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      executable: pip3.9
+    loop:
+    - cryptography
+    - PyMySQL
 
-    - name: Download shipping application
-      ansible.builtin.get_url:
-        url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
-        dest: /tmp/shipping.zip
+  - name: import shipping data
+    community.mysql.mysql_db:
+      state: import
+      name: all
+      login_host: "{{ MYSQL_HOST }}"
+      login_user: root
+      login_password: RoboShop@1
+      target: "{{ item }}"
+    loop:
+    - /app/db/schema.sql
+    - /app/db/app-user.sql  
+    - /app/db/master-data.sql
 
-    - name: Extract shipping application
-      ansible.builtin.unarchive:
-        src: /tmp/shipping.zip
-        dest: /app
-        remote_src: yes
-
-    - name: Set ownership of application files
-      ansible.builtin.file:
-        path: /app
-        owner: movie
-        group: movie
-        recurse: yes
-
-    - name: Build shipping application
-      ansible.builtin.command:
-        cmd: mvn clean package
-        chdir: /app
-
-    - name: Rename shipping jar
-      ansible.builtin.command:
-        cmd: mv target/shipping-1.0.jar shipping.jar
-        chdir: /app
-
-    - name: Copy Shipping service file
-      ansible.builtin.template:
-        src: shipping.service
-        dest: /etc/systemd/system/shipping.service
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: Copy MySQL repository file
-      ansible.builtin.copy:
-        src: files/mysql.repo
-        dest: /etc/yum.repos.d/mysql.repo
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: Import Shipping schema
-      ansible.builtin.shell: 
-       cmd: mysql < /app/db/schema.sql
-
-    - name: Import App User schema
-      ansible.builtin.shell: 
-       cmd: mysql < /app/db/app-user.sql
-
-    - name: Import Master Data
-      ansible.builtin.shell: 
-       cmd: mysql < /app/db/master-data.sql
-
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: yes
-
-    - name: Enable and start Shipping service
-      ansible.builtin.systemd:
-        name: shipping
-        state: restarted
-        enabled: yes
+  - name: start and enable shipping
+    ansible.builtin.service:
+      name: shipping
+      state: restarted
+      enabled: yes
+  
