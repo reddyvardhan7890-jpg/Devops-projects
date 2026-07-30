@@ -43,6 +43,13 @@
        src: /tmp/shipping.zip
        dest: /app
        remote_src: yes
+
+  - name: Change ownership
+    ansible.builtin.file:
+      path: /app
+      owner: movie
+      group: movie
+      recurse: yes
   
   - name: install dependencies
     ansible.builtin.command: mvn clean package
@@ -62,6 +69,11 @@
   - name: daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true
+  
+  - name: Install Python pip
+    ansible.builtin.dnf:
+      name: python3-pip
+      state: present
 
   - name: install dependencie
     ansible.builtin.pip:
