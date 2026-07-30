@@ -4,18 +4,15 @@
   tasks: 
   - name: Disable NodeJS module
     ansible.builtin.command: dnf module disable nodejs -y
+    changed_when: false
 
   - name: Enable NodeJS 20 module
     ansible.builtin.command: dnf module enable nodejs:20 -y
+    changed_when: false
 
   - name: Install NodeJS
     ansible.builtin.dnf:
       name: nodejs
-      state: present
-
-  - name: install nodejs  
-    ansible.builtin.dnf:
-      name: nodejs 
       state: present
 
   - name: create a user
@@ -54,6 +51,10 @@
       src: /tmp/user.zip
       dest: /app
       remote_src: yes
+  
+  - name: install dependencies
+    community.general.npm:
+      path: /app
 
   - name: Change ownership of app
     ansible.builtin.file:
@@ -62,9 +63,7 @@
       group: movie
       recurse: yes
 
-  - name: install dependencies
-    community.general.npm:
-      path: /app
+ 
 
   - name: Copy user service file
     ansible.builtin.template:
