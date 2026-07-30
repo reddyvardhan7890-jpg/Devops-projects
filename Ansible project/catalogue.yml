@@ -45,6 +45,13 @@
     community.general.npm:
       path: /app
 
+  - name: Set ownership of app directory
+    ansible.builtin.file:
+      path: /app
+      owner: movie
+      group: movie
+      recurse: yes
+
   - name: Copy file with owner and permissions
     ansible.builtin.copy:
       src: catalogue.service
